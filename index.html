@@ -199,7 +199,6 @@
             auth()
           })
           .fail((xml,err) => {
-            // console.log(xml);
             $("#error-login").empty()
             $("#error-login").append(`
               <p style="color: red; text-align: center;">${xml.responseJSON.message}
@@ -220,7 +219,6 @@
         $("#comic-show").hide()
         $("#manga-show").hide()
         $("#game-show").show()
-
         
         let title = $("#title-game").val()
         $("#list-game-show").empty()
@@ -234,7 +232,6 @@
           }
         })
           .done(respone => {
-            console.log(respone);
             $("#title-game").val("")
             if(respone.length === 0){
               $("#list-game-show").append(`
@@ -255,7 +252,7 @@
                 </div>
               `)
               })
-            }
+            }            
           })
           .fail((xml,err) => {
             console.log(xml,err);
@@ -274,7 +271,7 @@
 
         let title = $("#title-comic").val()
         $("#list-comic-show").empty()
-
+        
         $.ajax({
           url: baseURL+"comic",
           method: "GET",
@@ -325,8 +322,10 @@
         $("#comic-show").hide()
         $("#manga-show").show()
         $("#game-show").hide()
+
         let title = $("#title-manga").val()
         $("#list-manga-show").empty()
+
         $.ajax({
           url: baseURL+"manga",
           method: "GET",
@@ -336,6 +335,7 @@
           }
         })
           .done(respone => {
+
             $("#title-manga").val("")
             if(respone.manga_list.length === 0){
               $("#list-manga-show").append(`
@@ -356,8 +356,7 @@
                 </div>
               `)
               })
-            }
-            
+            }            
           })
           .fail((xml,err) => {
             console.log(xml,err);
@@ -401,6 +400,7 @@
 
       function onSignIn(googleUser) {
         var id_token = googleUser.getAuthResponse().id_token;
+
         // console.log(id_token);
         $.ajax({
           url: baseURL+"googleLogin",
