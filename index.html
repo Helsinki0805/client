@@ -13,6 +13,9 @@
   <body>
     <!-- Login -->
     <section id="login" style="width: 100%; height: auto; padding: 100px; background-color: rgb(248, 248, 248);">
+      <div id="error-login">
+
+      </div>
       <div class="card col-6 mx-auto shadow p-3 mb-5 bg-white rounded" style="width: 500px; height: 400px;">
         <form>
           <div class="mb-3">
@@ -130,8 +133,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a onclick="comic()" class="nav-link active" href="#">Comic</a>
           <a onclick="manga()" class="nav-link" href="#">Manga</a>
+          <a onclick="comic()" class="nav-link" href="#">Comic</a>
           <a onclick="game()" class="nav-link" href="#">Games</a>
           <a onclick="logout()" class="nav-link" href="#" tabindex="-1" aria-disabled="true">Signout</a>
         </div>
@@ -196,7 +199,10 @@
             auth()
           })
           .fail((xml,err) => {
-            console.log(xml, err);
+            $("#error-login").empty()
+            $("#error-login").append(`
+              <p style="color: red; text-align: center;">${xml.responseJSON.message}
+            `)
           })
           .always(_ => {
             $("#email").val("")
@@ -213,8 +219,9 @@
         $("#comic-show").hide()
         $("#manga-show").hide()
         $("#game-show").show()
+        
         let title = $("#title-game").val()
-        // console.log(title); #search-game-show
+        $("#list-game-show").empty()
 
         $.ajax({
           url: baseURL+"game",
@@ -225,21 +232,27 @@
           }
         })
           .done(respone => {
-            console.log(respone);
-            respone.forEach(el => {
-
+            $("#title-game").val("")
+            if(respone.length === 0){
               $("#list-game-show").append(`
-              
-              <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
-                <img src="${el.thumb}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">${el.external}</h5>
-                  <p class="card-text">Price: $${el.cheapest}</p>
+                <h1 style="text-align: center;">Game not found! :'(</h1>
+              `)
+            }else{
+              $("#list-game-show").append(`
+                <h3>Total: ${respone.length}</h3>
+              `)
+              respone.forEach(el => {
+                $("#list-game-show").append(`
+                <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
+                  <img src="${el.thumb}" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title">${el.external}</h5>
+                    <p class="card-text">Price: $${el.cheapest}</p>
+                  </div>
                 </div>
-              </div>
-            `)
-            })
-            
+              `)
+              })
+            }            
           })
           .fail((xml,err) => {
             console.log(xml,err);
@@ -255,9 +268,10 @@
         $("#comic-show").show()
         $("#manga-show").hide()
         $("#game-show").hide()
-        let title = $("#title-comic").val()
-        console.log(title);
 
+        let title = $("#title-comic").val()
+        $("#list-comic-show").empty()
+        
         $.ajax({
           url: baseURL+"comic",
           method: "GET",
@@ -267,26 +281,36 @@
           }
         })
           .done(respone => {
-            console.log(respone);
-            respone.forEach(el => {
-              // let birth = el.biography.place-of-birth
+            $("#title-comic").val("")
+            if(respone.length === 0){
               $("#list-comic-show").append(`
-              
-              <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
-                <img src="${el.image.url}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">${el.name}</h5>
-                  <p class="card-text">${el.biography.publisher}</p>
+                <h1 style="text-align: center;">Comic not found! :'(</h1>
+              `)
+            }else{
+              $("#list-comic-show").append(`
+                <h3>Total: ${respone.length}</h3>
+              `)
+              respone.forEach(el => {
+                $("#list-comic-show").append(`
+                <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
+                  <img src="${el.image.url}" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title">${el.name}</h5>
+                    <p class="card-text">${el.biography.publisher}</p>
+                  </div>
                 </div>
-              </div>
+              `)
+              })
+            }
+          })
+          .fail((xml,err) => { //
+            $("#title-comic").val("")
+            $("#list-comic-show").append(`
+              <h1 style="text-align: center;">Comic not found! :'(</h1>
             `)
-            })
-            
+            console.log(xml);
+            console.log(err);
           })
-          .fail((xml,err) => {
-            console.log(xml,err);
-          })
-
       }
 
       function bacaManga(){
@@ -298,7 +322,9 @@
         $("#comic-show").hide()
         $("#manga-show").show()
         $("#game-show").hide()
+
         let title = $("#title-manga").val()
+        $("#list-manga-show").empty()
 
         $.ajax({
           url: baseURL+"manga",
@@ -309,18 +335,28 @@
           }
         })
           .done(respone => {
-            respone.manga_list.forEach(el => {
+
+            $("#title-manga").val("")
+            if(respone.manga_list.length === 0){
               $("#list-manga-show").append(`
-              <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
-                <img src="${el.thumb}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">${el.title}</h5>
-                  <p class="card-text">${el.type}</p>
+                <h1 style="text-align: center;">Manga not found! :'(</h1>
+              `)
+            }else{
+              $("#list-manga-show").append(`
+                <h3>Total: ${respone.manga_list.length}</h3>
+              `)
+              respone.manga_list.forEach(el => {
+                $("#list-manga-show").append(`
+                <div class="card shadow p-3 mb-5 bg-white rounded" style="width: 18rem; margin-left: 70px; margin-top: 30px;">
+                  <img src="${el.thumb}" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title">${el.title}</h5>
+                    <p class="card-text">${el.type}</p>
+                  </div>
                 </div>
-              </div>
-            `)
-            })
-            
+              `)
+              })
+            }            
           })
           .fail((xml,err) => {
             console.log(xml,err);
@@ -364,7 +400,22 @@
 
       function onSignIn(googleUser) {
         var id_token = googleUser.getAuthResponse().id_token;
-        console.log(id_token);
+
+        // console.log(id_token);
+        $.ajax({
+          url: baseURL+"googleLogin",
+          method: "POST",
+          data:{
+            googleToken: id_token
+          }
+        })
+          .done(data => {
+            localStorage.setItem("access_token", data.accessToken)
+            auth()
+          })
+          .fail((xml,err) => {
+            console.log(xml,err);
+          })
       } 
 
 
