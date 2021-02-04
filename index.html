@@ -42,7 +42,7 @@
     <section id="search-manga" style="margin-top: 70px;">
       <div class="container bg bg-light mt-3">
         <div id="search-manga-show" class="row">
-          <form>
+          <form id="manga">
             <div class="mb-3">
               <label for="exampleInputEmail1" class="form-label">Title Manga</label>
               <input type="text" class="form-control" id="title-manga" aria-describedby="emailHelp">
@@ -250,24 +250,104 @@
       </div>
     </div> -->
 
-
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <script>
-      
-      $(document).ready(() => {
-        $("#login").show()
-        $("#navbar").hide()
+      const baseURL = "http://localhost:3000/"
+      function onSignIn(googleUser) {
+        var id_token = googleUser.getAuthResponse().id_token;
+        console.log(id_token);
+      } 
+
+      function auth(){
+        if(!localStorage.getItem("access_token")){
+          $("#login").show()
+          $("#navbar").hide()
+          $("#search-manga").hide()
+          $("#search-comic").hide()
+          $("#search-game").hide()
+          $("#comic-show").hide()
+          $("#manga-show").hide()
+          $("#game-show").hide()
+        }else{
+          $("#login").hide()
+          $("#navbar").show()
+          $("#search-manga").show()
+          $("#search-comic").hide()
+          $("#search-game").hide()
+          $("#comic-show").hide()
+          $("#manga-show").hide()
+          $("#game-show").hide()
+        }
+      }
+
+      function login(){
+        let email= $("#email").val()
+        let password = $("#password").val()
+        // console.log(email,password);
+        $.ajax({
+          url: baseURL+"login",
+          method: "POST",
+          data:{email,password}
+        })
+          .done(data => {
+            // console.log(data);
+            localStorage.setItem("access_token", data.accessToken)
+            auth()
+          })
+          .fail((xml,err) => {
+            console.log(xml, err);
+          })
+          .always(_ => {
+            $("#email").val("")
+            $("#password").val("")
+          })
+      }
+
+      function getManga(){
+        $("#login").hide()
+        $("#navbar").show()
         $("#search-manga").hide()
         $("#search-comic").hide()
         $("#search-game").hide()
         $("#comic-show").hide()
-        $("#manga-show").hide()
+        $("#manga-show").show()
         $("#game-show").hide()
+        let title = $("#title-manga").val()
+        console.log(title);
+
+        $.ajax({
+          url: baseURL+"manga",
+          method: "GET",
+          data:{title: title},
+          headers:{
+            token: localStorage.getItem("access_token")
+          }
+        })
+          .done(respone => {
+            console.log(respone);
+          })
+          .fail((xml,err) => {
+            console.log(xml,err);
+          })
+      }
+
+
+      $(document).ready(() => {
+        auth()
+        $("#button-login").click((e) => {
+          e.preventDefault()
+          login()
+        })
+
+        $("#manga").on("submit",(e) => {
+          e.preventDefault()
+          getManga()
+        })
       })
     </script>
   </body>
