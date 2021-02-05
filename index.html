@@ -203,6 +203,11 @@
             $("#error-login").append(`
               <p style="color: red; text-align: center;">${xml.responseJSON.message}
             `)
+            
+            setTimeout(() => {
+              console.log('set timeout');
+              $("#error-login").empty()
+            }, 5000);
           })
           .always(_ => {
             $("#email").val("")
